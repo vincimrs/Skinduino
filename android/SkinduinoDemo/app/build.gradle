@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
-        applicationId "edu.mit.media.living.duoskindemo"
+        applicationId "edu.mit.media.living.skinduinodemo"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1

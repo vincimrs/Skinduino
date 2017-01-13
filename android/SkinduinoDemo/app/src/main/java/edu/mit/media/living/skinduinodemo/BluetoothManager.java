@@ -31,7 +31,7 @@ public class BluetoothManager {
     private ConnectedThread mConnectedThread;
 
     private Context mContext;
-    private OnLineReceivedListener mListener;
+    private BluetoothCallback mCallback;
 
     // Well known SPP UUID
     private static final UUID MY_UUID =
@@ -39,8 +39,11 @@ public class BluetoothManager {
 
     private String mAddress;// = "00:06:66:45:0D:15";
 
-    public interface OnLineReceivedListener {
+    public interface BluetoothCallback {
         void lineReceived(String line);
+        void deviceUnpaired();
+        void connectionFailed();
+        void connectionBroken();
     }
 
     public BluetoothManager(Context context, String address) {
@@ -55,12 +58,12 @@ public class BluetoothManager {
         mHandler = new Handler();
     }
 
-    public OnLineReceivedListener getOnLineReceivedListener() {
-        return mListener;
+    public  BluetoothCallback getBluetoothCallback() {
+        return mCallback;
     }
 
-    public void setOnLineReceivedListener(OnLineReceivedListener l) {
-        mListener = l;
+    public void setBluetoothCallback(BluetoothCallback l) {
+        mCallback = l;
     }
 
     public boolean isBluetoothEnabled() {
@@ -86,6 +89,7 @@ public class BluetoothManager {
         }
 
         if(mBluetoothDevice == null) {
+            mCallback.deviceUnpaired();
             return false;
         } else {
             mConnectThread = new ConnectThread(mBluetoothDevice);
@@ -137,6 +141,8 @@ public class BluetoothManager {
                 try {
                     mmSocket.close();
                 } catch (IOException closeException) { }
+
+                mCallback.connectionFailed();
                 return;
             }
 
@@ -173,7 +179,7 @@ public class BluetoothManager {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) { }
+            } catch (IOException e) {}
 
             mmInStream = new BufferedReader(new InputStreamReader(tmpIn));
             mmOutStream = tmpOut;
@@ -188,6 +194,7 @@ public class BluetoothManager {
                     StringRunnable sr = new StringRunnable(line);
                     mHandler.post(sr);
                 } catch (IOException e) {
+                    mCallback.connectionBroken();
                     break;
                 }
             }
@@ -216,8 +223,8 @@ public class BluetoothManager {
         }
 
         public void run() {
-            if(mListener != null) {
-                mListener.lineReceived(mLine);
+            if(mCallback != null) {
+                mCallback.lineReceived(mLine);
             }
         }
     }
