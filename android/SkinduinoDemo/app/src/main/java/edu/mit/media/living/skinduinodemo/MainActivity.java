@@ -1,5 +1,7 @@
 package edu.mit.media.living.skinduinodemo;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -8,7 +10,10 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import static android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_ENABLE_BT = 1;
     private static final String BLUETOOTH_ADDRESS = "00:06:66:85:9A:0E";
     private BluetoothManager mBluetoothManager;
     private CapTouchParser mCapTouchParser;
@@ -31,6 +36,15 @@ public class MainActivity extends AppCompatActivity {
         mStatus = (TextView)findViewById(R.id.status);
         mAdapter = new CapTouchAdapter(this, mCapTouchParser.getCapTouchValues());
         mGridView.setAdapter(mAdapter);
+
+        checkBluetoothEnabled();
+    }
+
+    private void checkBluetoothEnabled() {
+        if(!mBluetoothManager.isBluetoothEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
     }
 
     @Override
@@ -43,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                            | SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
 
@@ -51,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         clearStatus();
+
         mBluetoothManager.init();
     }
 
@@ -76,6 +91,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_ENABLE_BT ) {
+            checkBluetoothEnabled();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
