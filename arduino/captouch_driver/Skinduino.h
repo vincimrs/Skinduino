@@ -21,11 +21,11 @@ class Skinduino {
       
       counter = 0;
       Wire.beginTransmission(i2caddr_default); 
-      Wire.write(0x80);
+      Wire.write(0x81); ///only the 1-8 are broken out
       Wire.endTransmission(false);
-      Wire.requestFrom(0x25,15);  
+      Wire.requestFrom(0x25,8);  
       while(Wire.available()) { 
-        sensorValues[counter]= Wire.read();
+        sensorValues[7-counter]= Wire.read();
         counter++;
       }
     }

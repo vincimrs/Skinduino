@@ -1,5 +1,6 @@
 #include "Skinduino.h"
 
+const int NUM_CAPTOUCH_PINS = 8;
 int incomingByte = 0;
 Skinduino skinduino;
 
@@ -13,7 +14,7 @@ void loop() {
   skinduino.readSensorValues(); 
 
   printSerialChar(skinduino.sensorValues[0]);
-  for(int i=1; i<15; i++){
+  for(int i=1; i<NUM_CAPTOUCH_PINS; i++){
     printSerialString(",");
     printSerialChar(skinduino.sensorValues[i]);
   }
