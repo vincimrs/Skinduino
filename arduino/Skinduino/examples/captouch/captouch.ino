@@ -1,4 +1,4 @@
-#include "Skinduino.h"
+#include <Skinduino.h>
 
 const int NUM_CAPTOUCH_PINS = 8;
 int incomingByte = 0;
@@ -11,12 +11,12 @@ void setup() {
 }
 
 void loop() { 
-  skinduino.readSensorValues(); 
+  skinduino.readCapacitiveTouchValues(); 
 
-  printSerialChar(skinduino.sensorValues[0]);
+  printSerialChar(skinduino.capacitiveTouchValues[0]);
   for(int i=1; i<NUM_CAPTOUCH_PINS; i++){
     printSerialString(",");
-    printSerialChar(skinduino.sensorValues[i]);
+    printSerialChar(skinduino.capacitiveTouchValues[i]);
   }
 
   newlineSerial();
@@ -24,7 +24,7 @@ void loop() {
   // set baseline
   getCommand();
   if (incomingByte == '1') { 
-    skinduino.setCapacitiveBaseline();
+    skinduino.setCapacitiveTouchBaseline();
     delay(1000);
   }
     

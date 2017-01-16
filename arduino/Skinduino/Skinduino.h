@@ -6,12 +6,12 @@
 
 class Skinduino {
   public:
-    unsigned char sensorValues[15];
+    unsigned char capacitiveTouchValues[15];
     
     Skinduino() {}
     
-    void setCapacitiveBaseline();
-    void readSensorValues();
+    void setCapacitiveTouchBaseline();
+    void readCapacitiveTouchValues();
     
   private:
     int _counter;

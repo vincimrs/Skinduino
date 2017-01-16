@@ -1,0 +1,3 @@
+Skinduino	KEYWORD1
+setCapacitiveTouchBaseline	KEYWORD2
+readCapacitiveTouchValues	KEYWORD2
