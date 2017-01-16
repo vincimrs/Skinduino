@@ -1,9 +1,7 @@
-#include <Wire.h>
+#include "Skinduino.h"
 
-uint8_t i2caddr_default = 0x25;
-unsigned char sensorValues[15];// = {'1','1','1','1','1','1','1','1','1','1','1','1','1','1','1'}; 
-int counter = 0;
 int incomingByte = 0;
+Skinduino skinduino;
 
 void setup() { 
   Wire.begin();
@@ -12,13 +10,12 @@ void setup() {
 }
 
 void loop() { 
-  setSensorValuesToZero();
-  readSensorValues(); 
+  skinduino.readSensorValues(); 
 
-  printSerialChar(sensorValues[0]);
+  printSerialChar(skinduino.sensorValues[0]);
   for(int i=1; i<15; i++){
     printSerialString(",");
-    printSerialChar(sensorValues[i]);
+    printSerialChar(skinduino.sensorValues[i]);
   }
 
   newlineSerial();
@@ -26,7 +23,7 @@ void loop() {
   // set baseline
   getCommand();
   if (incomingByte == '1') { 
-    setBaseline(i2caddr_default);
+    skinduino.setCapacitiveBaseline();
     delay(1000);
   }
     
@@ -56,30 +53,3 @@ void newlineSerial() {
   Serial.println();
   Serial1.println();
 }
-
-void readSensorValues() { 
-  counter = 0;
-  Wire.beginTransmission(i2caddr_default); 
-  Wire.write(0x80);
-  Wire.endTransmission(false);
-  Wire.requestFrom(0x25,15);  
-  while(Wire.available()) { 
-    sensorValues[counter]= Wire.read();
-    counter++;
-  }
-}
-
-// TODO is this necessary??
-void setSensorValuesToZero() { 
-  for(int i=0; i<15; i++){
-    sensorValues[i] = 0;
-  }  
-} //end setSensorValuesToZero
-
-void setBaseline(uint8_t address) { 
-  Wire.beginTransmission(address);
-  Wire.write(0x04);
-  Wire.write(0x01);
-  Wire.endTransmission();
-}
-
