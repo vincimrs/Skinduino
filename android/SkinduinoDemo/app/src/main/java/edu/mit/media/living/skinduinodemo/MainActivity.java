@@ -15,8 +15,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import static android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     private String mBluetoothAddress = null;
@@ -56,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        /*
         if (hasFocus) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
+        */
     }
 
     @Override
@@ -112,6 +112,10 @@ public class MainActivity extends AppCompatActivity {
                         .setAdapter(adapter, mSelectDeviceListener)
                         .show();
 
+                return true;
+
+            case R.id.set_baseline:
+                mBluetoothManager.write("1");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
