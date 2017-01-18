@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -117,6 +118,12 @@ public class BluetoothManager {
 
         if(mConnectedThread != null) {
             mConnectedThread.cancel();
+        }
+    }
+
+    public void write(String msg) {
+        if(mConnectedThread != null) {
+            mConnectedThread.write(msg.getBytes(Charset.forName("ASCII")));
         }
     }
 
