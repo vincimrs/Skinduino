@@ -1,10 +1,10 @@
-import ddf.minim.spi.*;
-import ddf.minim.signals.*;
-import ddf.minim.*;
-import ddf.minim.analysis.*;
-import ddf.minim.ugens.*;
-import ddf.minim.effects.*;
+/*
 
+IMPORTANT
+
+This sketch should be run on Processing 2.x. It will NOT work on Processing 3.x.
+
+*/
 import processing.serial.*;
 import javax.swing.*;
 import java.io.*;
@@ -21,6 +21,7 @@ void setup() {
   if (frame != null) {
     frame.setResizable(true);
   }
+  
   background(255);
    
   // load serial list
@@ -54,22 +55,10 @@ void setup() {
   noLoop();
 }
 
-// SHOW PRESS KEY WHEN READY
-// SHOW 3 2 1
-// trials
-// SHOW END
-
 void draw() {
   background(255);
   for(int i=0; i<buttons.length; ++i) {
     buttons[i].display();
-  }
-
-  updateSliderPos();  
-  if(show) {
-    ellipseMode(CENTER);
-    fill(0);
-    ellipse(sliderPos, 640, 25, 25);
   }
 }
 
@@ -84,60 +73,16 @@ void setBaseline() {
   arduinoPort.write(" ");
 }
 
-void updateSliderPos() {
-  int sum = 0;
-  int maxIndex = 0, maxValue = -1;
-  for(int i=0; i<NUM_BUTTONS; ++i) {
-    int cap = buttons[i].getCapacitance();
-    if(maxValue < 0 || cap > maxValue) {
-      maxIndex = i;
-      maxValue = cap;
-    }
-    
-    sum += cap;
-  }
-  
-  show = sum > 100;
-  
-  int adjIndex, adjValue;
-  if(maxIndex == 0) {
-    adjIndex = 1;
-  } else if(maxIndex == NUM_BUTTONS - 1) {
-    adjIndex = NUM_BUTTONS - 2;
-  } else if(buttons[maxIndex - 1].getCapacitance() > buttons[maxIndex + 1].getCapacitance()) {
-    adjIndex = maxIndex - 1;
-  } else {
-    adjIndex = maxIndex + 1;
-  }
-  
-  adjValue = buttons[adjIndex].getCapacitance();
-  
-  if(maxValue + adjValue == 0) {
-    sliderPos = buttons[maxIndex].getX();
-  } else {
-    sliderPos = (buttons[maxIndex].getX() * maxValue + buttons[adjIndex].getX() * adjValue) / (maxValue + adjValue); 
-  }
-}
-
 void serialEvent(Serial p) {
-  String line = p.readStringUntil('\n').trim();
-  //println(line);
+  String line = p.readStringUntil('\n');
   String[] toks = line.split(",");
  
-  if(toks.length > 9) {
-    println(line);
-    
+  if(toks.length >= NUM_BUTTONS){  
     for(int i=1; i<=NUM_BUTTONS; ++i) {
-      println(toks[i]);
-      toks[i] = toks[i].trim(); //Trimming space in front so it does not crash
       int c = Integer.parseInt(toks[i]);
       buttons[i-1].setCapacitance(c);
     }
     
-   
     redraw();
-    
-    
   }
-  
 }
