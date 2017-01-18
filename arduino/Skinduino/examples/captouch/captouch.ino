@@ -27,7 +27,8 @@ void loop() {
     skinduino.setCapacitiveTouchBaseline();
     delay(1000);
   }
-    
+
+  delay(80);
 } //end loop
 
 void getCommand() {

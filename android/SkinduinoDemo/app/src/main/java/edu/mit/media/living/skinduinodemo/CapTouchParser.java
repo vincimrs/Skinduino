@@ -8,7 +8,7 @@ public class CapTouchParser {
         mCapTouchValues = new int[size];
         mSize = size;
 
-        mCapTouchValues = new int[] { 0, 255, 255, 100, 150, 0, 0, 50, 100, 150, 200, 250, 255, 0, 100};
+        mCapTouchValues = new int[size];
     }
 
     public int[] getCapTouchValues() {

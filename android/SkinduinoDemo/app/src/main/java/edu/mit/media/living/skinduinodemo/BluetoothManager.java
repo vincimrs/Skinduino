@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,8 +38,6 @@ public class BluetoothManager {
     private static final UUID MY_UUID =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private String mAddress;// = "00:06:66:45:0D:15";
-
     public interface BluetoothCallback {
         void lineReceived(String line);
         void deviceUnpaired();
@@ -45,7 +45,7 @@ public class BluetoothManager {
         void connectionBroken();
     }
 
-    public BluetoothManager(Context context, String address) {
+    public BluetoothManager(Context context) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
@@ -53,7 +53,6 @@ public class BluetoothManager {
         }
 
         mContext = context;
-        mAddress = address;
         mHandler = new Handler();
     }
 
@@ -73,13 +72,27 @@ public class BluetoothManager {
         return true;
     }
 
-    public boolean init() {
+    public List<BluetoothDevice> getPairedDevices() {
+        List<BluetoothDevice> devices = new ArrayList<>();
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         // If there are paired devices
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
-                if(mAddress.equals(device.getAddress())) {
+                devices.add(device);
+            }
+        }
+
+        return devices;
+    }
+
+    public boolean connect(String bluetoothAddress) {
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        // If there are paired devices
+        if (pairedDevices.size() > 0) {
+            // Loop through paired devices
+            for (BluetoothDevice device : pairedDevices) {
+                if(bluetoothAddress.equals(device.getAddress())) {
                     mBluetoothDevice = device;
                     break;
                 }

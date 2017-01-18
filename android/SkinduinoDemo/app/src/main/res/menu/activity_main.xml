@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/reconnect"
-        android:title="Reconnect"
+        android:id="@+id/connect"
+        android:title="Connect"
         app:showAsAction="never" />
 </menu>

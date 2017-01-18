@@ -1,8 +1,11 @@
 package edu.mit.media.living.skinduinodemo;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,13 +13,16 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import static android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final String BLUETOOTH_ADDRESS = "00:06:66:85:9A:0E";
+    private String mBluetoothAddress = null;
     private BluetoothManager mBluetoothManager;
     private CapTouchParser mCapTouchParser;
+    private List<BluetoothDevice> mDevices;
 
     private GridView mGridView;
     private TextView mStatus;
@@ -27,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBluetoothManager = new BluetoothManager(this, BLUETOOTH_ADDRESS);
-        mCapTouchParser = new CapTouchParser(15);
+        mBluetoothManager = new BluetoothManager(this);
+        mCapTouchParser = new CapTouchParser(8);
 
         mBluetoothManager.setBluetoothCallback(mBluetoothCallback);
 
@@ -64,9 +70,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        clearStatus();
 
-        mBluetoothManager.init();
+        setStatusText("Disconnected");
+        tryConnectBluetooth();
+    }
+
+    private void tryConnectBluetooth() {
+        if(mBluetoothAddress != null) {
+            if(mBluetoothManager.connect(mBluetoothAddress)) {
+                clearStatus();
+            } else {
+                setStatusText("Failed to connect to " + mBluetoothAddress);
+            }
+        }
     }
 
     @Override
@@ -85,14 +101,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.reconnect:
+            case R.id.connect:
                 clearStatus();
-                mBluetoothManager.init();
+
+                mDevices = mBluetoothManager.getPairedDevices();
+                PairedDeviceAdapter adapter = new PairedDeviceAdapter(this, mDevices);
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Select a device to connect to")
+                        .setAdapter(adapter, mSelectDeviceListener)
+                        .show();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private DialogInterface.OnClickListener mSelectDeviceListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int position) {
+            mBluetoothAddress = mDevices.get(position).getAddress();
+            setStatusText("Connecting to " + mBluetoothAddress);
+            tryConnectBluetooth();
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
